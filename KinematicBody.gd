@@ -6,11 +6,14 @@ var velocity = Vector3(0,0,0)
 var direction = Vector3(0,0,0)
 var mouse_axis := Vector2()
 var mouse_sensitivity = 12.0
-var acceleration = 4;
+var acceleration = 5;
+var gravity = 0.2;
+var max_slope_angle = 89;
+var collision_normal = Vector3(0,1,0);
 onready var head: Spatial = $Head
 onready var cam: Camera = $Head/Camera
 
-var speed = 0.03
+var speed = 0.1
 
 
 # Called when the node enters the scene tree for the first time.
@@ -22,7 +25,13 @@ func _ready():
 	pass
 	
 func _input(event: InputEvent) -> void:
-	
+	if event.is_action_pressed("ui_cancel"):
+		#get_tree().quit() # Quits the game
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		
+	if event.is_action_pressed("mouse_input"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+		
 	if event is InputEventMouseMotion:
 		mouse_axis = event.relative
 
@@ -62,14 +71,26 @@ func _physics_process(delta):
 	
 	var tempVel = velocity.y
 	velocity = velocity.linear_interpolate(direction, acceleration * delta)
+	#if (Vector3(velocity.x,0,velocity.z).length() > direction.length())
+	#	velocity.x
 	velocity.y = tempVel
 	
 	#print(Vector3(0,1,0).angle_to(Vector3(0.5,0.5,0)))
 	var col = move_and_collide(velocity, false, false)
-	print(Vector3(velocity.x,0,velocity.z).length())
+	print(Vector3(velocity.x,0,velocity.z).length(), "  ", velocity)
+	
 	if col:
-		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
-		#print(col.normal)
-		velocity.y = (-1/col.normal.y) * ((velocity.x * col.normal.x)+(velocity.z * col.normal.z)) #thanks timothy!
-		#velocity.y = sin(Vector3(0,1,0).angle_to(col.normal)) * ((1/(cos(Vector3(0,1,0).angle_to(col.normal))) * Vector3(velocity.x,0,velocity.z).length()))
+		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+			collision_normal = col.normal
 		
+		
+	var col2 = move_and_collide(Vector3.DOWN*3, false, false, true)
+	if col2:
+		
+		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
+			collision_normal = col2.normal
+			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x)+(velocity.z * collision_normal.z))
+		
+	else:
+		
+		velocity.y -= gravity * delta;
