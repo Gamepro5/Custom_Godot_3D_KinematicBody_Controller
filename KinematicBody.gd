@@ -66,7 +66,10 @@ func _physics_process(delta):
 	
 	#print(Vector3(0,1,0).angle_to(Vector3(0.5,0.5,0)))
 	var col = move_and_collide(velocity, false, false)
-	print(velocity)
+	print(Vector3(velocity.x,0,velocity.z).length())
 	if col:
-		velocity.y = sin(Vector3(0,1,0).angle_to(col.normal)) * ((1/(cos(Vector3(0,1,0).angle_to(col.normal))) * Vector3(velocity.x,0,velocity.z).length()))
+		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
+		#print(col.normal)
+		velocity.y = (-1/col.normal.y) * ((velocity.x * col.normal.x)+(velocity.z * col.normal.z)) #thanks timothy!
+		#velocity.y = sin(Vector3(0,1,0).angle_to(col.normal)) * ((1/(cos(Vector3(0,1,0).angle_to(col.normal))) * Vector3(velocity.x,0,velocity.z).length()))
 		
