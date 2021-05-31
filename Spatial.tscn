@@ -25,9 +25,10 @@ height = 4.0
 [node name="Spatial" type="Spatial"]
 
 [node name="StaticBody" type="StaticBody" parent="."]
-transform = Transform( 0.080539, 14.5351, 0, -0.132432, 8.83956, 0, 0, 0, 10.684, -0.483, 0, -0.569 )
+transform = Transform( 0.0465412, 8.39942, 8.71951, -0.132432, 8.83956, 0, -0.0657301, -11.8625, 6.17398, -3.28691, 0, -0.569 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
+transform = Transform( 1, 0, 0, 2.56114e-09, 1, -2.98023e-08, 0, 5.96046e-08, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -35,7 +36,7 @@ material/0 = null
 shape = SubResource( 3 )
 
 [node name="Ball" type="StaticBody" parent="."]
-transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, -12.5177, -1.24858, -4.78137 )
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, -1.23405, -1.24858, 18.3364 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Ball"]
 transform = Transform( 1, 0, 0, 4.65661e-10, 1, 0, 0, 0, 1, 0, 0, 0 )
@@ -60,7 +61,7 @@ shape = SubResource( 3 )
 transform = Transform( -6.18057e-09, -15.5188, 4.37707, 0.155, -7.43617e-07, 0, 2.77571e-09, 6.96953, 9.74623, -0.170012, 16.7517, 49.016 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody7"]
-transform = Transform( 1, -5.11591e-13, 1.13687e-13, 2.08167e-17, 1, 1.49012e-08, 0, 0, 1, 0, 0, 0 )
+transform = Transform( 1, -2.84217e-13, 0, 4.16334e-17, 1, 4.47035e-08, -2.77556e-17, -1.19209e-07, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -79,10 +80,10 @@ material/0 = null
 shape = SubResource( 3 )
 
 [node name="StaticBody4" type="StaticBody" parent="."]
-transform = Transform( 0.12194, 7.70771, 4.47965, -0.0825129, 14.3209, 0.952914, -0.0484453, -4.99083, 9.65259, 2.78924, 0, -3.3273 )
+transform = Transform( 0.101568, 5.83648, 7.19012, -0.0825129, 14.3209, 0.952914, -0.0830681, -7.08891, 7.84487, -1.22754, 0, -6.83976 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody4"]
-transform = Transform( 1, 1.04904e-05, 3.8147e-06, 6.40284e-10, 1, 2.98023e-08, 4.65661e-10, 1.49012e-07, 1, 0, 0, 0 )
+transform = Transform( 1, 1.43051e-05, 3.8147e-06, 6.98492e-10, 1, 2.98023e-08, 9.31323e-10, 2.08616e-07, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -122,11 +123,11 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.015, 0 )
 
 [node name="Camera" type="Camera" parent="KinematicBody/Head"]
 transform = Transform( -1.19209e-07, 0, -1, 0, 1, 0, 1, 0, -1.19209e-07, 0, 0, 0 )
+current = true
 far = 8192.0
 
 [node name="Camera2" type="Camera" parent="KinematicBody/Head"]
 transform = Transform( -5.41251e-08, 0.277516, -0.960721, -2.98639e-08, 0.960721, 0.277516, 1, 4.37114e-08, -4.37114e-08, -6.27509, 2.30789, 0 )
-current = true
 far = 8192.0
 
 [node name="RayCast" type="RayCast" parent="."]

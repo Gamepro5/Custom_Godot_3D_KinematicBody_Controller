@@ -75,9 +75,9 @@ func _physics_process(delta):
 	velocity = velocity.linear_interpolate(direction, acceleration * delta)
 	velocity.y = tempVel
 	
-	
+	move_and_collide(velocity*delta, false, false)
 	# SNAP CODE on floor?
-	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001), false, false, true)
+	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*10+0.01), false, false, true)
 	#var col2 = move_and_collide(-collision_normal*(Vector3(floor_direction.x,0,floor_direction.z).length()+0.1), false, false, true)
 	if col2:
 		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
@@ -95,33 +95,39 @@ func _physics_process(delta):
 	
 	get_node("../RayCast").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
+	get_node("../RayCast").cast_to = velocity#-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
+	get_node("../RayCast2").translation = translation;
+	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
+	get_node("../RayCast2").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*10+0.01)
 	
 	
 	if (!on_floor):
-		print("REE")
+		#print("REE")
 		floor_direction = Vector3(0,0,0)
 		collision_normal = Vector3(0,1,0)
 	if (rad2deg(Vector3(0,1,0).angle_to(collision_normal)) > 89):
 		print("fuck")
 	#print(floor_direction)
 	var col = move_and_collide(velocity*delta, false, false, true)
-	
 	#print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
 	if col:
 		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
 		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
-			move_and_collide(velocity*delta, false, false)
+			#move_and_collide(velocity*delta, false, false)
 			collision_normal = col.normal
 			floor_direction = velocity
+			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x) + (velocity.z * collision_normal.z))
+			print("touched_and_corrected")
 		else:
 			#tempVel = velocity.y
 			#velocity = move_and_slide(velocity)
 			#velocity.y = tempVel
-			move_and_collide(velocity*delta, false, false)
+			#move_and_collide(velocity*delta, false, false)
+			pass
 	else:
 		#tempVel = velocity.y
 		#velocity = move_and_slide(velocity)	
 		#velocity.y = tempVel
-		move_and_collide(velocity*delta, false, false)
+	#	move_and_collide(velocity*delta, false, false)
+		pass
 	
