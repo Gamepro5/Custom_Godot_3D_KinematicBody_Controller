@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://KinematicBody.gd" type="Script" id=1]
 [ext_resource path="res://773426.jpg" type="Texture" id=2]
@@ -11,7 +11,15 @@ material = SubResource( 1 )
 
 [sub_resource type="BoxShape" id=3]
 
-[sub_resource type="CylinderShape" id=4]
+[sub_resource type="SpatialMaterial" id=4]
+albedo_texture = ExtResource( 2 )
+
+[sub_resource type="SphereMesh" id=5]
+material = SubResource( 4 )
+
+[sub_resource type="SphereShape" id=6]
+
+[sub_resource type="CylinderShape" id=7]
 height = 4.0
 
 [node name="Spatial" type="Spatial"]
@@ -26,6 +34,18 @@ material/0 = null
 [node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
 shape = SubResource( 3 )
 
+[node name="Ball" type="StaticBody" parent="."]
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, -12.5177, -1.24858, -4.78137 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Ball"]
+transform = Transform( 1, 0, 0, 4.65661e-10, 1, 0, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 5 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="Ball"]
+transform = Transform( 1, 0, 0, 1.86265e-09, 1, 0, 0, 0, 1, 0, 0, 0 )
+shape = SubResource( 6 )
+
 [node name="StaticBody5" type="StaticBody" parent="."]
 transform = Transform( 0.0639926, 0.854292, -9.71614, -0.0187151, 16.8875, 0, 0.139927, 1.868, 4.44347, -0.483, 0, 35.128 )
 
@@ -36,10 +56,33 @@ material/0 = null
 [node name="CollisionShape" type="CollisionShape" parent="StaticBody5"]
 shape = SubResource( 3 )
 
+[node name="StaticBody7" type="StaticBody" parent="."]
+transform = Transform( -6.18057e-09, -15.5188, 4.37707, 0.155, -7.43617e-07, 0, 2.77571e-09, 6.96953, 9.74623, -0.170012, 16.7517, 49.016 )
+
+[node name="MeshInstance" type="MeshInstance" parent="StaticBody7"]
+transform = Transform( 1, -5.11591e-13, 1.13687e-13, 2.08167e-17, 1, 1.49012e-08, 0, 0, 1, 0, 0, 0 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody7"]
+shape = SubResource( 3 )
+
+[node name="StaticBody6" type="StaticBody" parent="."]
+transform = Transform( 0.412857, 15.0651, -272.823, -0.120743, 297.805, -3.45972e-06, 0.902757, 32.9415, 124.77, -0.483, 0, 81.2792 )
+
+[node name="MeshInstance" type="MeshInstance" parent="StaticBody6"]
+transform = Transform( 1, 0, 3.8147e-06, 0, 1, 0, -2.32831e-10, -3.72529e-09, 1, 0, 0, 0 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody6"]
+shape = SubResource( 3 )
+
 [node name="StaticBody4" type="StaticBody" parent="."]
 transform = Transform( 0.12194, 7.70771, 4.47965, -0.0825129, 14.3209, 0.952914, -0.0484453, -4.99083, 9.65259, 2.78924, 0, -3.3273 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody4"]
+transform = Transform( 1, 1.04904e-05, 3.8147e-06, 6.40284e-10, 1, 2.98023e-08, 4.65661e-10, 1.49012e-07, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -72,21 +115,25 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1914, 2.019, 4.54603 )
 script = ExtResource( 1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="KinematicBody"]
-shape = SubResource( 4 )
+shape = SubResource( 7 )
 
 [node name="Head" type="Spatial" parent="KinematicBody"]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.015, 0 )
 
 [node name="Camera" type="Camera" parent="KinematicBody/Head"]
 transform = Transform( -1.19209e-07, 0, -1, 0, 1, 0, 1, 0, -1.19209e-07, 0, 0, 0 )
+far = 8192.0
+
+[node name="Camera2" type="Camera" parent="KinematicBody/Head"]
+transform = Transform( -5.41251e-08, 0.277516, -0.960721, -2.98639e-08, 0.960721, 0.277516, 1, 4.37114e-08, -4.37114e-08, -6.27509, 2.30789, 0 )
 current = true
 far = 8192.0
 
-[node name="Camera" type="Camera" parent="KinematicBody"]
-transform = Transform( -4.37114e-08, 1, 2.82321e-22, 4.37114e-08, 1.91069e-15, 1, 1, 4.37114e-08, -4.37114e-08, 0, 10.1325, 0 )
-
 [node name="RayCast" type="RayCast" parent="."]
-transform = Transform( 0.932223, -0.361885, 0, 0.361885, 0.932223, 0, 0, 0, 1, 0, 0, 0 )
+enabled = true
 
 [node name="Camera" type="Camera" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.421, 2.353, 24.149 )
+
+[node name="RayCast2" type="RayCast" parent="."]
+enabled = true

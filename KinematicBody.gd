@@ -13,6 +13,7 @@ var on_floor = false;
 var collision_normal = Vector3(0,1,0);
 onready var head: Spatial = $Head
 onready var cam: Camera = $Head/Camera
+var floor_direction = Vector3(0,0,0)
 
 var speed = 15
 
@@ -72,36 +73,55 @@ func _physics_process(delta):
 	
 	var tempVel = velocity.y
 	velocity = velocity.linear_interpolate(direction, acceleration * delta)
-	#if (Vector3(velocity.x,0,velocity.z).length() > direction.length())
-	#	velocity.x
 	velocity.y = tempVel
 	
-	#print(Vector3(0,1,0).angle_to(Vector3(0.5,0.5,0)))
-	var col = move_and_collide(velocity*delta, false, false, true)
-	print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
 	
-	if col:
-		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
-		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
-			move_and_collide(velocity*delta, false, false)
-			collision_normal = col.normal
-		else:
-			velocity = move_and_slide(velocity)
-	else:
-		velocity = move_and_slide(velocity)	
-		
 	# SNAP CODE on floor?
-	#var col2 = move_and_collide(-collision_normal, false, false, true)
-	var col2 = move_and_collide(-collision_normal, false, false, true)
+	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001), false, false, true)
+	#var col2 = move_and_collide(-collision_normal*(Vector3(floor_direction.x,0,floor_direction.z).length()+0.1), false, false, true)
 	if col2:
 		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
 		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
-			
+			floor_direction = velocity
 			collision_normal = col2.normal
 			on_floor = true;
-			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x)+(velocity.z * collision_normal.z))
+			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x) + (velocity.z * collision_normal.z))
 		else:
 			on_floor = false;
 	else:
 		on_floor = false;
 		velocity.y -= gravity * delta;
+		
+	
+	get_node("../RayCast").translation = translation;
+	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
+	get_node("../RayCast").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
+	
+	
+	if (!on_floor):
+		print("REE")
+		floor_direction = Vector3(0,0,0)
+		collision_normal = Vector3(0,1,0)
+	if (rad2deg(Vector3(0,1,0).angle_to(collision_normal)) > 89):
+		print("fuck")
+	#print(floor_direction)
+	var col = move_and_collide(velocity*delta, false, false, true)
+	
+	#print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
+	if col:
+		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
+		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+			move_and_collide(velocity*delta, false, false)
+			collision_normal = col.normal
+			floor_direction = velocity
+		else:
+			#tempVel = velocity.y
+			#velocity = move_and_slide(velocity)
+			#velocity.y = tempVel
+			move_and_collide(velocity*delta, false, false)
+	else:
+		#tempVel = velocity.y
+		#velocity = move_and_slide(velocity)	
+		#velocity.y = tempVel
+		move_and_collide(velocity*delta, false, false)
+	
