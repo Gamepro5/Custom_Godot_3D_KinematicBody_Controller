@@ -7,13 +7,14 @@ var direction = Vector3(0,0,0)
 var mouse_axis := Vector2()
 var mouse_sensitivity = 12.0
 var acceleration = 5;
-var gravity = 0.2;
+var gravity = 30;
 var max_slope_angle = 89;
+var on_floor = false;
 var collision_normal = Vector3(0,1,0);
 onready var head: Spatial = $Head
 onready var cam: Camera = $Head/Camera
 
-var speed = 0.1
+var speed = 15
 
 
 # Called when the node enters the scene tree for the first time.
@@ -76,21 +77,31 @@ func _physics_process(delta):
 	velocity.y = tempVel
 	
 	#print(Vector3(0,1,0).angle_to(Vector3(0.5,0.5,0)))
-	var col = move_and_collide(velocity, false, false)
-	print(Vector3(velocity.x,0,velocity.z).length(), "  ", velocity)
+	var col = move_and_collide(velocity*delta, false, false, true)
+	print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
 	
 	if col:
+		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
 		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+			move_and_collide(velocity*delta, false, false)
 			collision_normal = col.normal
-		
-		
-	var col2 = move_and_collide(Vector3.DOWN*3, false, false, true)
-	if col2:
-		
-		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
-			collision_normal = col2.normal
-			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x)+(velocity.z * collision_normal.z))
-		
+		else:
+			velocity = move_and_slide(velocity)
 	else:
+		velocity = move_and_slide(velocity)	
 		
+	# SNAP CODE on floor?
+	#var col2 = move_and_collide(-collision_normal, false, false, true)
+	var col2 = move_and_collide(-collision_normal, false, false, true)
+	if col2:
+		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
+		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
+			
+			collision_normal = col2.normal
+			on_floor = true;
+			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x)+(velocity.z * collision_normal.z))
+		else:
+			on_floor = false;
+	else:
+		on_floor = false;
 		velocity.y -= gravity * delta;
