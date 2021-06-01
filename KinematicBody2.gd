@@ -10,12 +10,11 @@ var acceleration = 5;
 var gravity = 30;
 var max_slope_angle = 89;
 var on_floor = false;
-var on_wall = false;
 var collision_normal = Vector3(0,1,0);
 onready var head: Spatial = $Head
 onready var cam: Camera = $Head/Camera
 var floor_direction = Vector3(0,0,0)
-var use_slide = false;
+
 var speed = 15
 
 
@@ -78,74 +77,70 @@ func _physics_process(delta):
 	
 	#move_and_collide(velocity*delta, false, false)
 	# SNAP CODE on floor?
-	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
-	var col = move_and_collide(velocity*delta, false, false, true)
-	
+	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()+5)+5*delta), false, false, true)
+	#var col2 = move_and_collide(-collision_normal*(Vector3(floor_direction.x,0,floor_direction.z).length()+0.1), false, false, true)
 	if col2:
 		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
 		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
-			
 			floor_direction = velocity
 			collision_normal = col2.normal
 			on_floor = true;
 			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x) + (velocity.z * collision_normal.z))
 			get_node("../Label").text = "on_floor"
-			on_wall = false;
 		else:
-			
 			on_floor = false;
 			get_node("../Label").text = "on_wall"
-			on_wall = true;
 	else:
-		
 		on_floor = false;
+		velocity.y -= gravity * delta;
 		get_node("../Label").text = "in_air"
-		on_wall = false;
-	if col:
-		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
-			#move_and_collide(velocity*delta, false, false)
-			collision_normal = col.normal
-			floor_direction = velocity
-			on_floor = true;
-			get_node("../Label").text = "on_floor"
-			on_wall = false;
-			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x) + (velocity.z * collision_normal.z))
-		else:
-			get_node("../Label").text = "on_wall"
-			on_wall = true;
-			on_floor = false;
-			col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
-			if col2:
-				print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
-				if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
-					on_floor = true;
-			
+		
+	
 	get_node("../RayCast").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
 	get_node("../RayCast").cast_to = velocity#-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
 	get_node("../RayCast2").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast2").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+10)+10*delta)
+	get_node("../RayCast2").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*10+0.01)
 	
 	
 	if (!on_floor):
-		#get_node("../Label").text = "not_on_floor"
-		velocity.y -= gravity * delta;
+		get_node("../Label").text = "not_on_floor"
 		floor_direction = Vector3(0,0,0)
 		collision_normal = Vector3(0,1,0)
 		
 	else:
-		#get_node("../Label").text = "on_floor"
+		get_node("../Label").text = "on_floor"
 		if Input.is_action_just_pressed("jump"):
-			velocity.y = 40
-			collision_normal = Vector3(0,1,0)
-	
+			velocity.y = 10
+			collision_normal = Vector3.ZERO
+	if (rad2deg(Vector3(0,1,0).angle_to(collision_normal)) > 89):
+		print("fuck")
 		
-	
+	#print(floor_direction)
+	var col = move_and_collide(velocity*delta, false, false, true)
 	#print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
-	#print(on_wall)
-	if (on_wall):
-		velocity = move_and_slide(velocity)
-		
+	if col:
+		#print(rad2deg(Vector3(0,1,0).angle_to(col.normal)))
+		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+			#move_and_collide(velocity*delta, false, false)
+			collision_normal = col.normal
+			floor_direction = velocity
+			on_floor = true;
+			velocity.y = (-1/collision_normal.y) * ((velocity.x * collision_normal.x) + (velocity.z * collision_normal.z))
+			print("touched_and_corrected")
+		else:
+			on_floor = false;
+			#tempVel = velocity.y
+			#velocity = move_and_slide(velocity)
+			#velocity.y = tempVel
+			#move_and_collide(velocity*delta, false, false)
+			pass
 	else:
-		move_and_collide(velocity*delta, false, false)
+		#tempVel = velocity.y
+		#velocity = move_and_slide(velocity)	
+		#velocity.y = tempVel
+	#	move_and_collide(velocity*delta, false, false)
+		pass
+	
+	move_and_collide(velocity*delta, false, false)
