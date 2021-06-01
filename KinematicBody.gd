@@ -102,9 +102,15 @@ func _physics_process(delta):
 	
 	
 	if (!on_floor):
-		#print("REE")
+		get_node("../Label").text = "not_on_floor"
 		floor_direction = Vector3(0,0,0)
 		collision_normal = Vector3(0,1,0)
+		
+	else:
+		get_node("../Label").text = "on_floor"
+		if Input.is_action_just_pressed("jump"):
+			velocity.y = 10
+			collision_normal = Vector3.ZERO
 	if (rad2deg(Vector3(0,1,0).angle_to(collision_normal)) > 89):
 		print("fuck")
 	#print(floor_direction)

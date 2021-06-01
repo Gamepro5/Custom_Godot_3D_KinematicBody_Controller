@@ -28,7 +28,7 @@ height = 4.0
 transform = Transform( 0.0465412, 8.39942, 8.71951, -0.132432, 8.83956, 0, -0.0657301, -11.8625, 6.17398, -3.28691, 0, -0.569 )
 
 [node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
-transform = Transform( 1, 0, 0, 2.56114e-09, 1, -2.98023e-08, 0, 5.96046e-08, 1, 0, 0, 0 )
+transform = Transform( 1, 3.8147e-06, 1.90735e-06, 2.56114e-09, 1, 0, 2.32831e-10, 1.78814e-07, 1, 0, 0, 0 )
 mesh = SubResource( 2 )
 material/0 = null
 
@@ -112,7 +112,7 @@ material/0 = null
 shape = SubResource( 3 )
 
 [node name="KinematicBody" type="KinematicBody" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.1914, 2.019, 4.54603 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3.191, 6.398, 4.546 )
 script = ExtResource( 1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="KinematicBody"]
@@ -138,3 +138,12 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.421, 2.353, 24.149 )
 
 [node name="RayCast2" type="RayCast" parent="."]
 enabled = true
+
+[node name="Label" type="Label" parent="."]
+margin_left = 20.0
+margin_top = 14.0
+margin_right = 60.0
+margin_bottom = 28.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
