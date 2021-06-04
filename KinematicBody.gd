@@ -78,7 +78,8 @@ func _physics_process(delta):
 	
 	#move_and_collide(velocity*delta, false, false)
 	# SNAP CODE on floor?
-	var col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
+	var col2vector = -collision_normal*((Vector3(0,1,0).angle_to(collision_normal)*100+100)*delta)#-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta)
+	var col2 = move_and_collide(col2vector, false, false, true)
 	var col = move_and_collide(velocity*delta, false, false, true)
 	
 	if col2:
@@ -114,7 +115,7 @@ func _physics_process(delta):
 			get_node("../Label").text = "on_wall"
 			on_wall = true;
 			on_floor = false;
-			col2 = move_and_collide(-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
+			col2 = move_and_collide(col2vector, false, false, true)
 			if col2:
 				print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
 				if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
@@ -122,10 +123,10 @@ func _physics_process(delta):
 			
 	get_node("../RayCast").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast").cast_to = velocity#-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
+	get_node("../RayCast").cast_to = velocity*delta#-collision_normal*(Vector3(0,1,0).angle_to(collision_normal)/5+0.001)
 	get_node("../RayCast2").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast2").cast_to = -collision_normal*(Vector3(0,1,0).angle_to(collision_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+10)+10*delta)
+	get_node("../RayCast2").cast_to = col2vector
 	
 	
 	if (!on_floor):
