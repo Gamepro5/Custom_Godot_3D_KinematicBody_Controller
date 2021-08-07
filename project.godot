@@ -18,6 +18,10 @@ config/name="Custom_Kinematic_Physics"
 run/main_scene="res://Spatial.tscn"
 config/icon="res://icon.png"
 
+[debug]
+
+settings/fps/force_fps=60
+
 [input]
 
 move_forward={
@@ -53,7 +57,6 @@ jump={
 
 [physics]
 
-common/physics_fps=120
 common/enable_pause_aware_picking=true
 
 [rendering]

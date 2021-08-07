@@ -8,7 +8,7 @@ var mouse_axis := Vector2()
 var mouse_sensitivity = 12.0
 var acceleration = 5;
 var gravity = 30;
-var max_slope_angle = 45;
+var max_slope_angle = 89;
 var on_floor = false;
 var on_wall = false;
 var floor_normal = Vector3(0,1,0);
@@ -82,8 +82,8 @@ func _physics_process(delta):
 	
 	#move_and_collide(velocity*delta, false, false)
 	# SNAP CODE on floor?
-	var col2 = move_and_collide(-floor_normal*(Vector3(0,1,0).angle_to(floor_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
-	var col = move_and_collide(velocity*delta, false, false, true)
+	var col2 = move_and_collide(-floor_normal*delta, false, false, true) #must scale movement vector strange bug.
+	var col = move_and_collide(velocity.normalized()*delta, false, false, true)
 	
 	if col2:
 		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
@@ -93,6 +93,7 @@ func _physics_process(delta):
 			floor_normal = col2.normal
 			on_floor = true;
 			velocity.y = (-1/floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
+			
 			get_node("../Label").text = "on_floor"
 			on_wall = false;
 		else:
@@ -117,11 +118,11 @@ func _physics_process(delta):
 			get_node("../Label").text = "on_floor"
 			on_wall = false;
 			velocity.y = (-1/floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
+			
 		else:
 			get_node("../Label").text = "on_wall"
 			on_wall = true;
 			on_floor = false;
-			col2 = move_and_collide(-floor_normal*(Vector3(0,1,0).angle_to(floor_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+5)+5*delta), false, false, true)
 			if col2:
 				print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
 				if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
@@ -129,10 +130,10 @@ func _physics_process(delta):
 			
 	get_node("../RayCast").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast").cast_to = velocity#-floor_normal*(Vector3(0,1,0).angle_to(floor_normal)/5+0.001)
+	get_node("../RayCast").cast_to = velocity.normalized()#-floor_normal*(Vector3(0,1,0).angle_to(floor_normal)/5+0.001)
 	get_node("../RayCast2").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
-	get_node("../RayCast2").cast_to = -floor_normal*(Vector3(0,1,0).angle_to(floor_normal)*(Vector3(floor_direction.x,0,floor_direction.z).length()*5+10)+10*delta)
+	get_node("../RayCast2").cast_to = -floor_normal
 	
 	
 	if (!on_floor):
@@ -160,4 +161,5 @@ func _physics_process(delta):
 		velocity = move_and_slide(velocity)
 		
 	else:
+		#velocity = move_and_slide_with_snap(velocity, -floor_normal/5)
 		move_and_collide(velocity*delta, false, false)
