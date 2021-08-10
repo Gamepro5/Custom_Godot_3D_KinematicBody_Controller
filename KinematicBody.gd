@@ -18,14 +18,17 @@ onready var cam: Camera = $Head/Camera
 var floor_direction = Vector3(0,0,0)
 var use_slide = false;
 var speed = 15
-
-
+var col
+var col2
+var relevant_collision
+var impulse_velocity = Vector3(0,0,0)
+var previous_floor_normal = Vector3(0,1,0)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
-	print(direction)
+	
 	pass
 	
 func _input(event: InputEvent) -> void:
@@ -82,52 +85,40 @@ func _physics_process(delta):
 	
 	#move_and_collide(velocity*delta, false, false)
 	# SNAP CODE on floor?
-	var col2 = move_and_collide(-floor_normal*delta, false, false, true) #must scale movement vector strange bug.
-	var col = move_and_collide(velocity.normalized()*delta, false, false, true)
 	
-	if col2:
-		#print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
-		if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
-			
-			floor_direction = velocity
-			floor_normal = col2.normal
-			on_floor = true;
-			velocity.y = (-1/floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
-			
-			get_node("../Label").text = "on_floor"
-			on_wall = false;
-		else:
-			
-			on_floor = false;
-			get_node("../Label").text = "on_wall"
-			on_wall = true;
-			
-		collision_normal = col2.normal;
-	else:
-		
-		on_floor = false;
-		get_node("../Label").text = "in_air"
-		on_wall = false;
+	# MAYBE USE PREVIOUS COLLISION TO SEE IF YOU SHOULD SNAP. SOMETHING LIKE IF JUMP KEY NOT PRESSED AND PREVIOUS COLLISION WAS ON FLOOR, THEN SNAP.
+	
+	if !col:
+		col = move_and_collide(velocity*delta, false, false, true)
+	
+	
 	if col:
 		collision_normal = col.normal;
 		if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+			
+			relevant_collision = col
 			#move_and_collide(velocity*delta, false, false)
 			floor_normal = col.normal
 			floor_direction = velocity
 			on_floor = true;
-			get_node("../Label").text = "on_floor"
+			
 			on_wall = false;
-			velocity.y = (-1/floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
+			
+			#velocity.y = (-1/floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
+			
+			
 			
 		else:
-			get_node("../Label").text = "on_wall"
+			
 			on_wall = true;
 			on_floor = false;
 			if col2:
-				print(rad2deg(Vector3(0,1,0).angle_to(col2.normal)))
+				
 				if (rad2deg(Vector3(0,1,0).angle_to(col2.normal)) <= max_slope_angle):
 					on_floor = true;
 			
+	
+	
 	get_node("../RayCast").translation = translation;
 	#get_node("../RayCast").translation.y = get_node("../RayCast").translation.y - 1.5;
 	get_node("../RayCast").cast_to = velocity.normalized()#-floor_normal*(Vector3(0,1,0).angle_to(floor_normal)/5+0.001)
@@ -136,30 +127,70 @@ func _physics_process(delta):
 	get_node("../RayCast2").cast_to = -floor_normal
 	
 	
-	if (!on_floor):
-		#get_node("../Label").text = "not_on_floor"
-		if (on_wall): 
+	
+		
+	
+	var gt = get_global_transform();
+	
+	var snap = move_and_collide(-floor_normal*((Vector3(0,1,0).angle_to(floor_normal))*5+1), false, false, true)
+	if (snap):
+		if (rad2deg(Vector3(0,1,0).angle_to(snap.normal)) <= max_slope_angle):
+			if(impulse_velocity == Vector3.ZERO):
+				gt.origin += snap.travel;
+				set_global_transform(gt);
+				velocity.y = (-1/previous_floor_normal.y) * ((velocity.x * floor_normal.x) + (velocity.z * floor_normal.z))
+				
+				
+	var floor_check = move_and_collide(-floor_normal*delta, false, false, true)
+	if (floor_check):
+		if (rad2deg(Vector3(0,1,0).angle_to(floor_check.normal)) <= max_slope_angle):
+			impulse_velocity = Vector3(0,0,0)
+			on_floor = true
+			floor_normal = floor_check.normal
+			
 			if Input.is_action_just_pressed("jump"):
-				velocity = Vector3(0,1,0) + (collision_normal*12);
-		
-		velocity.y -= gravity * delta;
-		floor_direction = Vector3(0,0,0)
-		floor_normal = Vector3(0,1,0)
-		
+				if (on_wall):
+					impulse_velocity = Vector3(0,1,0) + (collision_normal*12);
+					velocity = Vector3(0,1,0) + (collision_normal*12);
+				else: 
+					impulse_velocity.y = 12
+					velocity.y = 12
+					floor_normal = Vector3(0,1,0)
 	else:
-		#get_node("../Label").text = "on_floor"
-		if Input.is_action_just_pressed("jump"):
-			velocity.y = 12
+		if col:
+			if (rad2deg(Vector3(0,1,0).angle_to(col.normal)) <= max_slope_angle):
+				
+				on_floor = true
+				floor_normal = col.normal
+				
+				#get_node("../Label").text = "on_floor"
+		else:
+			on_floor = false
 			floor_normal = Vector3(0,1,0)
+			velocity.y -= gravity * delta;
+			#get_node("../Label").text = "on_floor"
 	
-		
+	print(impulse_velocity)
 	
+	get_node("../RayCast2").cast_to = -floor_normal
+	
+	if (on_floor):
+		if (on_wall):
+			get_node("../Label").text = "on_wall"
+		else:
+			get_node("../Label").text = "on_floor"
+	else:
+		get_node("../Label").text = "in_air"
 	#print(Vector3(velocity.x,0,velocity.z).length(), "  ", on_floor, "  " , velocity)
 	#print(on_wall)
 	
-	if (on_wall):
+	col = null
+	
+	if (on_wall || !on_floor):
 		velocity = move_and_slide(velocity)
 		
 	else:
 		#velocity = move_and_slide_with_snap(velocity, -floor_normal/5)
-		move_and_collide(velocity*delta, false, false)
+		col = move_and_collide(velocity*delta, false, false)
+	
+	previous_floor_normal = floor_normal
